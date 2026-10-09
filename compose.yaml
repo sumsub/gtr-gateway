@@ -1,0 +1,66 @@
+# Local end-to-end stand: the mock GTR (mutual TLS) with a mock Sumsub API, and the two example gateways.
+#
+#   docker compose up --build -d
+#   scripts/e2e.sh
+#
+# Everything below is throwaway test material: never reuse these keys or secrets anywhere else.
+x-gateway-environment: &gateway-environment
+  GTR_API_URL: https://mock-gtr:9443
+  GTR_CA_CERT_PATH: /secrets/mock-ca.pem
+  GTR_CLIENT_CERT_PATH: /secrets/gtr-client.p12
+  GTR_CLIENT_CERT_PASSWORD: changeit
+  GTR_VASP_CODE: local-vasp
+  GTR_ACCESS_KEY: mock-access-key
+  GTR_SECRET_KEY: mock-secret-key
+  GTR_PRIVATE_KEY: dGVzdF9zZWVkXzFfZm9yX3JlcHJvZHVjaWJsZV9rZXl6YemRd/vFOK2+/TU5BLwL9uV1VYMa+XG9UEcHDyMP+w==
+  SUMSUB_SECRET_KEY: local-gateway-secret
+  SUMSUB_API_URL: http://mock-gtr:9080
+  SUMSUB_APP_TOKEN: mock-app-token
+  SUMSUB_APP_SECRET: mock-app-secret
+
+services:
+  mock-gtr:
+    build:
+      context: .
+      dockerfile: examples/typescript/mock/Dockerfile
+    ports:
+      - "9443:9443"
+      - "9080:9080"
+    volumes:
+      - mock-secrets:/app/secrets
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 9443"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  gateway-typescript:
+    build:
+      context: .
+      dockerfile: examples/typescript/Dockerfile
+    environment: *gateway-environment
+    env_file: test-vectors/pgp.env
+    ports:
+      - "8787:8080"
+    volumes:
+      - mock-secrets:/secrets:ro
+    depends_on:
+      mock-gtr:
+        condition: service_healthy
+
+  gateway-go:
+    build:
+      context: .
+      dockerfile: examples/go/Dockerfile
+    environment: *gateway-environment
+    env_file: test-vectors/pgp.env
+    ports:
+      - "8789:8080"
+    volumes:
+      - mock-secrets:/secrets:ro
+    depends_on:
+      mock-gtr:
+        condition: service_healthy
+
+volumes:
+  mock-secrets:

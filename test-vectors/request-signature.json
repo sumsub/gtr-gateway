@@ -1,0 +1,11 @@
+{
+  "description": "Request signature (contract §2). X-Payload-Digest is the hex HMAC of the X-Payload-Timestamp value, a dot and the raw request body, keyed with the secret key from the Sumsub dashboard; X-Payload-Digest-Alg names the hash. A gateway must reproduce every digest below and accept a request only when the timestamp is within its tolerance of the current time.",
+  "secretKey": "test-secret-key-0123456789",
+  "timestamp": "1756368000",
+  "body": "{\"vaspCode\":\"test-vasp\"}",
+  "digests": {
+    "HMAC_SHA1_HEX": "9b4f8b7798a84284b67b48c17992f2f4a9492407",
+    "HMAC_SHA256_HEX": "5cbee59ef4674e22c2c8eac2212e23535dae1cac7cda333ce7feb5b30944e2b3",
+    "HMAC_SHA512_HEX": "d1e5623b1b070b0f068126a50b1e8c9f27fb9a60afe4c4d925ca494e4b9e0508dafa66756a27dac3f5863b4be571c865e3176abf090195174872297cf53eff5e"
+  }
+}

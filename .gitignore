@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+.env
+*.p12
+secrets/
+.idea/
+*.iml
+.DS_Store

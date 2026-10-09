@@ -1,0 +1,14 @@
+*
+!go/
+!examples/go/
+!typescript/
+!examples/typescript/
+!package.json
+!package-lock.json
+!tsconfig.base.json
+**/node_modules/
+**/dist/
+**/coverage/
+**/.env
+**/*.p12
+**/secrets/

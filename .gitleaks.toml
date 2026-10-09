@@ -1,0 +1,16 @@
+# Throwaway PGP test keys shipped with the cross-implementation vectors (test-vectors/pgp.json and the
+# matching Compose env file). They exist only so every gateway can be tested against the same messages.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Throwaway keys and secrets used by the shared test vectors and the Compose stand; Ed25519KeyPair type annotations that the generic-api-key rule mistakes for secrets"
+paths = [
+  '''test-vectors/pgp\.json''',
+  '''test-vectors/pgp\.env''',
+  '''test-vectors/request-signature\.json''',
+]
+regexTarget = "match"
+regexes = [
+  '''Ed25519KeyPair''',
+]

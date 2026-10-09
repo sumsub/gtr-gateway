@@ -1,0 +1,294 @@
+openapi: 3.1.0
+info:
+  title: GTR gateway
+  version: 1.0.0
+  license:
+    name: MIT
+    identifier: MIT
+  description: |
+    Endpoints a VASP-hosted GTR gateway exposes to Sumsub. Every request is signed with an HMAC of its
+    timestamp and raw body (see the `PayloadDigest` security scheme), and a gateway rejects requests more
+    than five minutes from its clock. Unless stated otherwise the gateway forwards the body to GTR
+    unchanged and returns the GTR status and body verbatim.
+
+    The paths below are the ones the reference implementations use. They are a convention, not part
+    of the contract: the actual URL of every endpoint is configured in the Sumsub dashboard.
+servers:
+  - url: https://api.example.com/tr/gtr
+security:
+  - PayloadDigest: []
+paths:
+  /health:
+    get:
+      operationId: health
+      summary: Liveness check
+      description: Not called by Sumsub; for your own orchestrator.
+      security: []
+      responses:
+        '200':
+          description: The gateway is up.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string }
+        '5XX':
+          $ref: '#/components/responses/GatewayError'
+  /vasp/detail:
+    post:
+      operationId: vaspDetail
+      parameters:
+        - $ref: '#/components/parameters/XPayloadTimestamp'
+        - $ref: '#/components/parameters/XEncryption'
+      summary: Counterparty VASP details
+      description: Forward to `GET /api/vasp/detail?vaspCode=`.
+      requestBody:
+        required: true
+        content:
+          application/pgp-encrypted:
+            schema: { $ref: '#/components/schemas/PgpMessage' }
+          application/json:
+            schema:
+              type: object
+              required: [vaspCode]
+              properties:
+                vaspCode: { type: string }
+      responses:
+        default: { $ref: '#/components/responses/GtrResponse' }
+        '4XX':
+          $ref: '#/components/responses/GatewayError'
+        '5XX':
+          $ref: '#/components/responses/GatewayError'
+  /verify/auto-address-vasp-detection:
+    post:
+      operationId: autoAddressVaspDetection
+      parameters:
+        - $ref: '#/components/parameters/XPayloadTimestamp'
+        - $ref: '#/components/parameters/XEncryption'
+      summary: Detect the VASP behind a beneficiary address
+      description: Forward to `POST /api/verify/v2/auto_address_vasp_detection`.
+      requestBody:
+        required: true
+        content:
+          application/pgp-encrypted:
+            schema: { $ref: '#/components/schemas/PgpMessage' }
+          application/json:
+            schema: { $ref: '#/components/schemas/GtrPassthroughBody' }
+      responses:
+        default: { $ref: '#/components/responses/GtrResponse' }
+        '4XX':
+          $ref: '#/components/responses/GatewayError'
+        '5XX':
+          $ref: '#/components/responses/GatewayError'
+  /verify/one-step:
+    post:
+      operationId: oneStep
+      parameters:
+        - $ref: '#/components/parameters/XPayloadTimestamp'
+        - $ref: '#/components/parameters/XEncryption'
+      summary: Submit a Travel Rule transfer
+      description: |
+        Encrypt `payload` with the gateway private key and `targetVaspPublicKey`, put the result into
+        `encryptedPayload`, set `initiatorPublicKey` to the gateway public key, drop `payload` and forward
+        to `POST /api/verify/v2/one_step`.
+      requestBody:
+        required: true
+        content:
+          application/pgp-encrypted:
+            schema: { $ref: '#/components/schemas/PgpMessage' }
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/GtrPassthroughBody'
+                - type: object
+                  required: [payload, targetVaspPublicKey]
+                  properties:
+                    payload:
+                      type: object
+                      description: 'Plaintext IVMS 101 container: {"ivms101": {...}}.'
+                    targetVaspPublicKey:
+                      type: string
+                      description: Base64 Ed25519 public key of the counterparty VASP.
+      responses:
+        default: { $ref: '#/components/responses/GtrResponse' }
+        '4XX':
+          $ref: '#/components/responses/GatewayError'
+        '5XX':
+          $ref: '#/components/responses/GatewayError'
+  /verify/tx/submit:
+    post:
+      operationId: submitTxId
+      parameters:
+        - $ref: '#/components/parameters/XPayloadTimestamp'
+        - $ref: '#/components/parameters/XEncryption'
+      summary: Report the on-chain transaction hash
+      description: Forward to `POST /api/verify/tx/submit`.
+      requestBody:
+        required: true
+        content:
+          application/pgp-encrypted:
+            schema: { $ref: '#/components/schemas/PgpMessage' }
+          application/json:
+            schema:
+              type: object
+              required: [requestId, txId]
+              properties:
+                requestId: { type: string }
+                txId: { type: string }
+      responses:
+        default: { $ref: '#/components/responses/GtrResponse' }
+        '4XX':
+          $ref: '#/components/responses/GatewayError'
+        '5XX':
+          $ref: '#/components/responses/GatewayError'
+  /verify/end:
+    post:
+      operationId: endTravelRule
+      parameters:
+        - $ref: '#/components/parameters/XPayloadTimestamp'
+        - $ref: '#/components/parameters/XEncryption'
+      summary: End a Travel Rule transfer
+      description: Forward to `POST /api/verify/v2/end`.
+      requestBody:
+        required: true
+        content:
+          application/pgp-encrypted:
+            schema: { $ref: '#/components/schemas/PgpMessage' }
+          application/json:
+            schema:
+              type: object
+              required: [requestId, reasonType]
+              properties:
+                requestId: { type: string }
+                reasonType: { type: string }
+                reason: { type: string }
+      responses:
+        default: { $ref: '#/components/responses/GtrResponse' }
+        '4XX':
+          $ref: '#/components/responses/GatewayError'
+        '5XX':
+          $ref: '#/components/responses/GatewayError'
+  /callback:
+    post:
+      operationId: gtrCallback
+      summary: GTR callback (called by GTR, not by Sumsub)
+      description: |
+        Registered in the GTR portal as the VASP's callback URL. The gateway decrypts
+        `callbackData.encryptedPayload` for `callbackType` 4, forwards the container to
+        `POST {SUMSUB_API_URL}/resources/api/tr/gtrGateway/callback` signed with the Sumsub app token,
+        re-encrypts `data.payload` of the answer and returns it to GTR. Not covered by the
+        `PayloadDigest` scheme: authenticate GTR by its client certificate at your TLS terminator.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [callbackType]
+              properties:
+                requestId: { type: string }
+                invokeVaspCode: { type: string }
+                originatorVasp: { type: string }
+                beneficiaryVasp: { type: string }
+                callbackType: { type: integer }
+                callbackData:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: GTR callback response as returned by Sumsub, with `data.payload` re-encrypted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verifyStatus: { type: integer }
+                  verifyMessage: { type: string }
+                  data:
+                    type: object
+                    additionalProperties: true
+        '4XX':
+          description: Malformed callback; answered in the GTR `verifyStatus` shape.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verifyStatus: { type: integer }
+                  verifyMessage: { type: string }
+        '502':
+          description: Sumsub unreachable or rejected the request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verifyStatus: { type: integer, enum: [100001] }
+                  verifyMessage: { type: string }
+components:
+  parameters:
+    XPayloadTimestamp:
+      name: X-Payload-Timestamp
+      in: header
+      required: true
+      schema: { type: string, pattern: '^[0-9]+$' }
+      description: |
+        Unix time of the request in seconds. Covered by `X-Payload-Digest`; a gateway rejects a request
+        whose timestamp is more than five minutes from its own clock (contract §2).
+    XEncryption:
+      name: X-Encryption
+      in: header
+      required: false
+      schema: { type: string, enum: ['true'] }
+      description: |
+        Present (with value `true`) when payload encryption is enabled in the Sumsub dashboard (contract §2.1).
+        The body is then `application/pgp-encrypted`: an ASCII-armored OpenPGP message containing the JSON
+        request below, encrypted to the gateway public key and signed by the Sumsub key. `X-Payload-Digest`
+        covers the armored body as sent. The gateway decrypts, verifies the signature and then handles the JSON.
+  securitySchemes:
+    PayloadDigest:
+      type: apiKey
+      in: header
+      name: X-Payload-Digest
+      description: |
+        Hex HMAC of the `X-Payload-Timestamp` value, a dot and the raw request body, keyed with the shared
+        secret key. The algorithm is named in the `X-Payload-Digest-Alg` header: `HMAC_SHA256_HEX`,
+        `HMAC_SHA512_HEX` or `HMAC_SHA1_HEX`.
+  schemas:
+    PgpMessage:
+      type: string
+      description: |
+        ASCII-armored OpenPGP message: the JSON request of this operation encrypted to the gateway key and
+        signed by the Sumsub key, sent with `X-Encryption: true` (contract §2.1).
+    GtrPassthroughBody:
+      type: object
+      description: The GTR request body as documented by GTR; forwarded unchanged.
+      additionalProperties: true
+    GatewayError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          enum: [invalid_signature, invalid_request, crypto_failed, gtr_unreachable, gtr_login_failed, sumsub_unreachable, internal_error]
+        message: { type: string }
+  responses:
+    GatewayError:
+      description: A failure the gateway itself produced, not a GTR business error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GatewayError'
+    GtrResponse:
+      description: |
+        The GTR response, status and body unchanged. Gateway-originated failures use the
+        `GatewayError` shape with statuses 400, 401, 422, 500 or 502.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - type: object
+                additionalProperties: true
+              - $ref: '#/components/schemas/GatewayError'

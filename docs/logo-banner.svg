@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-label="GTR gateway by Sumsub">
+  <rect width="1280" height="640" fill="#0B1220"/>
+  <g transform="translate(120 128) scale(0.75)">
+    <rect width="512" height="512" rx="112" fill="#111A2E"/>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="30">
+      <path d="M110 268H256" stroke="#FFFFFF"/>
+      <path d="M256 268H356" stroke="#2DD4BF"/>
+      <path d="M202 166V370M310 166V370" stroke="#FFFFFF"/>
+      <path d="M170 166H342" stroke="#FFFFFF"/>
+      <path d="M192 128H320" stroke="#FFFFFF"/>
+      <circle cx="400" cy="268" r="34" stroke="#2DD4BF" stroke-width="28"/>
+    </g>
+    <circle cx="110" cy="268" r="42" fill="#FFFFFF"/>
+  </g>
+  <g font-family="Inter, 'Helvetica Neue', Arial, sans-serif" fill="#FFFFFF">
+    <text x="580" y="262" font-size="104" font-weight="700" letter-spacing="-2">GTR gateway</text>
+    <text x="584" y="326" font-size="34" fill="#9AA7BD">Client-hosted gateway between</text>
+    <text x="584" y="372" font-size="34" fill="#9AA7BD">Sumsub Travel Rule and the</text>
+    <text x="584" y="418" font-size="34" fill="#9AA7BD">Global Travel Rule network</text>
+    <text x="584" y="494" font-size="30" fill="#2DD4BF" font-weight="600">Go · TypeScript · contract · test vectors</text>
+  </g>
+</svg>

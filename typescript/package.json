@@ -1,0 +1,63 @@
+{
+  "name": "@sumsub/gtr-gateway",
+  "version": "0.1.0",
+  "description": "Sumsub GTR gateway for Node.js: request verification and decryption, the GTR API client with its PII envelope, and a framework-agnostic request handler",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sumsub/gtr-gateway.git",
+    "directory": "typescript"
+  },
+  "homepage": "https://github.com/sumsub/gtr-gateway/tree/main/typescript#readme",
+  "keywords": [
+    "sumsub",
+    "travel-rule",
+    "gtr",
+    "global-travel-rule",
+    "kyt"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.12"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "libsodium-wrappers": "^0.7.15",
+    "undici": "^7.10.0"
+  },
+  "peerDependencies": {
+    "openpgp": "^6.3.2"
+  },
+  "peerDependenciesMeta": {
+    "openpgp": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "openpgp": "^6.3.2"
+  }
+}

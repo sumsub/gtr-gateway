@@ -1,0 +1,20 @@
+name: gtr-gateway-typescript
+
+services:
+  gateway:
+    build:
+      context: ../..
+      dockerfile: examples/typescript/Dockerfile
+    env_file: .env
+    environment:
+      HOST: 0.0.0.0
+    ports:
+      - '${BIND_ADDRESS:-127.0.0.1}:${PORT:-8080}:${PORT:-8080}'
+    volumes:
+      - ./secrets:/app/secrets:ro
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped

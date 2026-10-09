@@ -1,0 +1,34 @@
+{
+  "name": "gtr-gateway-workspace",
+  "private": true,
+  "description": "Sumsub GTR gateway: TypeScript library and example",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "workspaces": [
+    "typescript",
+    "examples/typescript"
+  ],
+  "scripts": {
+    "postinstall": "npm run build --workspace typescript",
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "test": "npm test --workspaces --if-present",
+    "lint": "eslint . && prettier --check typescript examples/typescript",
+    "format": "prettier --write typescript examples/typescript"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/libsodium-wrappers": "^0.7.14",
+    "@types/node": "^22.15.0",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.71.1",
+    "vitest": "^5.0.3"
+  }
+}

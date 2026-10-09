@@ -1,0 +1,64 @@
+{
+  "description": "Cross-implementation vectors for the GTR PII envelope: Ed25519 keys converted to X25519, NaCl crypto_box (XSalsa20-Poly1305), packet = base64(nonce[24] || mac[16] || ciphertext). Signatures are Ed25519 detached signatures over the UTF-8 payload, base64-encoded. Generated with libsodium (PyNaCl); every gateway implementation must decrypt each encryptedPayload to its payload and reproduce each signature byte for byte. The keys below are throwaway test keys.",
+  "keyPairs": {
+    "gateway": {
+      "privateKey": "dGVzdF9zZWVkXzFfZm9yX3JlcHJvZHVjaWJsZV9rZXl6YemRd/vFOK2+/TU5BLwL9uV1VYMa+XG9UEcHDyMP+w==",
+      "publicKey": "emHpkXf7xTitvv01OQS8C/bldVWDGvlxvVBHBw8jD/s="
+    },
+    "counterparty": {
+      "publicKey": "U4+WtwyH5zliJopyqzXNvIMjyVV57NPKS6lVbqesAdc="
+    }
+  },
+  "vectors": [
+    {
+      "payload": "",
+      "signature": "F+/VZZFZx6Or63ETnFHYIPadzcxvbJp+DbcyE37pEKXRUIXAimt7RosTPRQNGU+o4ugYzN6K2W0HcmTM8sMjCg==",
+      "encryptedPayload": "shAkxDB2QSnLKVxTVfkKmRSaJ3jynbr3IggWGsI0blwwu3Kv7E6ODg=="
+    },
+    {
+      "payload": "A",
+      "signature": "IzwHjzVGPaTzufq6UJiKKVyNTRtlC7mzk8i2NC/KGV5ODoTq5dgqJTdT+SrJbCEg1duNX3HMeTFmdgMWymZVBg==",
+      "encryptedPayload": "EfKDYXNFEQFHHpZPFfcG38rS87YbKWpiSKN/C1xxwI3B3ux0bHC2irg="
+    },
+    {
+      "payload": "Hello, World!",
+      "signature": "wN482q6KObk62+MSyD9sR/2ZQ2rCOFWzkaSMyHtUtez0c7ymk/02K7T2Uh2Ao2raA10pkMP++JwLEMHC0p6IAA==",
+      "encryptedPayload": "PzriuojJ/w6cxdYLAgBpBpBxDKG68paeiCHFCaWVPZ9DwgTCAACMG6z0L6H9DgoY1oM3i/E="
+    },
+    {
+      "payload": "Special characters: àáâãäåæçèéêë",
+      "signature": "gY86YJcAhRnjQET3MJ4x594pr6QpBS/k0FuyGsB16uyxsEkZaQ52JMefmL89/FZk+HUgnBuEQ/VEr34SJ5KvBA==",
+      "encryptedPayload": "ac70OanpUv5A7I5Gr+sLb5nmC4VYu7ivZVcRisBThpOVBsytwtyXAFFMdb14isl6hKllUNgEyp7UUdLP1orO630m+syH8KoibC1wdvfE9pVr2JRI"
+    },
+    {
+      "payload": "{\"json\": \"data\", \"number\": 42, \"array\": [1, 2, 3]}",
+      "signature": "P/ga4GFs0kxT+SsgSdYcH8PWbkTUumox6jqMRDYu/NoM5cZV04I77TmnpRSKmtwQtiluR0cQgnDoOeZ9TxiOAg==",
+      "encryptedPayload": "2FwvdF58y8GNR5/jIr/L1SIh3Mcrd8f5L1ClzfKNpUPwHyzayO/yD28RALjjrbaPsnbLgPGdp/QjCeo2qkx0QKHTg/FF45YCv0V2wlKIdGLKLgSDPo0wpCl/"
+    },
+    {
+      "payload": "Unicode test: 你好世界 🌍 🚀 ✨",
+      "signature": "gLVv81RXaPn8pkxM+xmbKOM9LcBYUIdncAhvt6VWHWMDzdj++RePROTA5u1Izc/sMwGb41QrW+rxcITlBNWvCA==",
+      "encryptedPayload": "knLhWRQCN4UcJtOCHVnfDIx3GwlKj8ydR25agNSq4Vd3YQr4nSjwl2eNta9v32+1+xDmcYucGU2eay1qPQb2ovY4bvQYQOlKt8TPvjhf2rs="
+    },
+    {
+      "payload": "Long text: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      "signature": "hbSKeJ+Sg6J4Z0rWfBChljDuTKLQh/z9M2CO6Q82kmPL+My+TmuzGOmEZXcdgyDpCQrujZRCEhnn3fb9X7DMDw==",
+      "encryptedPayload": "qBmceFM4rrXgGunRvOnqpDvDEftYIxkC13yDvuPNfdszcUX/FGeK8vrOIZMz6qq0+5yT+1NmvqTYoT2XL0+WcejP30bFr9ZU5kmIm4WulC7p5mDRKM/d+XjjSrk6iWXcyNS+tIV/gq1rDbiPZLZ6qlRM2t84/c5EAAIrE/l58ul+dBeSAYE1iwKCa+QdiHZstWXw/zddlftc09rguFWENVphuuQ="
+    },
+    {
+      "payload": "Final compatibility test for digital signatures",
+      "signature": "EcInlaPn51v/rgrCGIX3B/tDF5ykMIiyQ40Zgb2DOhmKYvY11FZWnNHsO1iJHBvCnZ0aB+TEvcqfIJd2BHDZBQ==",
+      "encryptedPayload": "vgCl+yl2KnHdz///8twBErs7QHSW1XnaGxkWeNCUXWOkxdnHOb59GyRoIciOPgzo6NQI3jaP+J2WLXGpHvZ1+EVETBOFwcYuCmd8BdIxu1ZBTtAi5PKe"
+    },
+    {
+      "payload": "Cross-verification compatibility test",
+      "signature": "dhEnCXNjpNVYG1ltuD0y8dNBlni/DUE41ZXqHUrw1VjJHTe0Vfy1C28XeKJAnR8k99o0knnw1kSHBG6Z68G8AA==",
+      "encryptedPayload": "hUUxjDHKeWqXssEqFB/Gj+dvK/R7QZq8hcGZ1HFFaCSQsgQxX6na9arUsJXh+E+qoHqkFs3qp/WAa/6NeF2QuGghYT6aZg+e1Veq+dE="
+    },
+    {
+      "payload": "Cross-implementation encryption test: BouncyCastle ↔ Ivms101",
+      "signature": "9/Yolutcff02ZbE6GSDyvGyFWbhykgIBrSd8nhfxZDq9E2c/p7JGz9EkL2nW1CYpRh3cRJ4NdE3MSYchvteoDQ==",
+      "encryptedPayload": "KN/02rFeWlCJZ9mo2mTtPL8jmgXxU0CjLCeyu9TOh73X6qUVNDrX2WKhMZRT5t5qqq9VSj4jh1zjLYlfu7ync7iqtkhojj4GIO9zmaTilzIV0BTxdBGLI43TeGbFDVAhuk4zDsDZ"
+    }
+  ]
+}

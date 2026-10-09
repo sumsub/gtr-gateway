@@ -1,0 +1,26 @@
+{
+  "name": "gtr-gateway-example-typescript",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reference GTR gateway for the Sumsub Travel Rule integration (TypeScript, Fastify)",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node --env-file-if-exists=.env dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "mock:certs": "sh mock/generate-certs.sh",
+    "mock:gtr": "tsx mock/gtr-server.ts"
+  },
+  "dependencies": {
+    "@sumsub/gtr-gateway": "*",
+    "fastify": "^5.3.0",
+    "openpgp": "^6.3.2",
+    "undici": "^7.10.0",
+    "zod": "^3.25.0"
+  }
+}
